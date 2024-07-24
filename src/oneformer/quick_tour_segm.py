@@ -1,1 +1,0 @@
-# ref: https://huggingface.co/learn/computer-vision-course/en/unit3/vision-transformers/oneformer
