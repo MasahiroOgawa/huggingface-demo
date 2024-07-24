@@ -4,6 +4,7 @@ from PIL import Image
 import requests
 import matplotlib.pyplot as plt
 import torch
+import sys
 
 
 def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer_ade20k_dinat_large"):
@@ -78,17 +79,21 @@ def show_image_comparison(image, predicted_map, segmentation_title):
     plt.imshow(predicted_map)
     plt.title(segmentation_title + " Segmentation")
     plt.axis("off")
-    plt.show()
     plt.savefig("oneformer_segm.png")
+    plt.show()
 
 
 # run below sample if this file is called as main
 if __name__ == "__main__":
-    # load image
-    url = "https://huggingface.co/datasets/shi-labs/oneformer_demo/resolve/main/ade20k.jpeg"
-    response = requests.get(url, stream=True)
-    response.raise_for_status()  # Check for HTTP errors
-    image = Image.open(response.raw)
+    # read argument as an input image name. If there is no argument, use default.
+    if len(sys.argv) > 1:
+        image_path = sys.argv[1]
+        image = Image.open(image_path)
+    else:
+        url = "https://huggingface.co/datasets/shi-labs/oneformer_demo/resolve/main/ade20k.jpeg"
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Check for HTTP errors
+        image = Image.open(response.raw)
 
     # run segmentation
     model_name = "shi-labs/oneformer_ade20k_dinat_large"
