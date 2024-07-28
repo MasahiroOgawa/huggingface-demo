@@ -35,6 +35,7 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
         predicted_map = processor.post_process_semantic_segmentation(
             outputs, target_sizes=[image.size[::-1]]
         )[0]
+        segments_info = None
 
     elif task_type == "instance":
         inputs = processor(images=image, task_inputs=[
@@ -66,9 +67,10 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
     # debug
     print(f"predicted_map = {predicted_map}")
     print(f"segments_info = {segments_info}")
-    for segment in segments_info:
-        label = model.config.id2label[segment['label_id']]
-        print(f"segment id = {segment["id"]} : {label}")
+    if segments_info is not None:
+        for segment in segments_info:
+            label = model.config.id2label[segment['label_id']]
+            print(f"segment id = {segment["id"]} : {label}")
 
     return predicted_map
 
@@ -110,6 +112,7 @@ if __name__ == "__main__":
     model_name = "shi-labs/oneformer_ade20k_swin_tiny"
     # model_name = "shi-labs/oneformer_coco_swin_large"
     # model_name = "shi-labs/oneformer_ade20k_dinat_large"
-    task_to_run = "panoptic"
+    # task_to_run = "panoptic"
+    task_to_run = "semantic"
     predicted_map = run_segmentation(image, task_to_run, model_name)
     show_image_comparison(image, predicted_map, task_to_run)
