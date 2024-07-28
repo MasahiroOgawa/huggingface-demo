@@ -41,23 +41,31 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
                            "instance"], return_tensors="pt")
         with torch.no_grad():
             outputs = model(**inputs)
-        predicted_map = processor.post_process_instance_segmentation(
+        prediction = processor.post_process_instance_segmentation(
             outputs, target_sizes=[image.size[::-1]]
-        )[0]["segmentation"]
+        )[0]
+        predicted_map = prediction["segmentation"]
+        segments_info = prediction["segments_info"]
 
     elif task_type == "panoptic":
         inputs = processor(images=image, task_inputs=[
                            "panoptic"], return_tensors="pt")
         with torch.no_grad():
             outputs = model(**inputs)
-        predicted_map = processor.post_process_panoptic_segmentation(
+        prediction = processor.post_process_panoptic_segmentation(
             outputs, target_sizes=[image.size[::-1]]
-        )[0]["segmentation"]
+        )[0]
+        predicted_map = prediction["segmentation"]
+        segments_info = prediction["segments_info"]
 
     else:
         raise ValueError(
             "Invalid task type. Choose from 'semantic', 'instance', or 'panoptic'"
         )
+
+    # debug
+    print(f"predicted_map = {predicted_map}")
+    print(f"segments_info = {segments_info}")
 
     return predicted_map
 
@@ -96,8 +104,9 @@ if __name__ == "__main__":
         image = Image.open(response.raw)
 
     # run segmentation
-    model_name = "shi-labs/oneformer_ade20k_dinat_large"
+    model_name = "shi-labs/oneformer_ade20k_swin_tiny"
     # model_name = "shi-labs/oneformer_coco_swin_large"
+    # model_name = "shi-labs/oneformer_ade20k_dinat_large"
     task_to_run = "panoptic"
     predicted_map = run_segmentation(image, task_to_run, model_name)
     show_image_comparison(image, predicted_map, task_to_run)
