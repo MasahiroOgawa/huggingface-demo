@@ -16,6 +16,7 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
 
     Returns:
         PIL.Image: The segmented image.
+        segments_info (dictionary): contains additional information on each segment.
 
     Raises:
         ValueError: If the task type is invalid.
@@ -72,7 +73,7 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
             label = model.config.id2label[segment['label_id']]
             print(f"segment id = {segment["id"]} : {label}")
 
-    return predicted_map
+    return predicted_map, segments_info
 
 
 def show_image_comparison(image, predicted_map, segmentation_title):
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     model_name = "shi-labs/oneformer_ade20k_swin_tiny"
     # model_name = "shi-labs/oneformer_coco_swin_large"
     # model_name = "shi-labs/oneformer_ade20k_dinat_large"
-    # task_to_run = "panoptic"
-    task_to_run = "semantic"
-    predicted_map = run_segmentation(image, task_to_run, model_name)
+    task_to_run = "panoptic"
+    predicted_map, segments_info = run_segmentation(
+        image, task_to_run, model_name)
     show_image_comparison(image, predicted_map, task_to_run)
