@@ -66,6 +66,11 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
     # debug
     print(f"predicted_map = {predicted_map}")
     print(f"segments_info = {segments_info}")
+    for segment in segments_info:
+        print(f"segment id = {segment["id"]}")
+        print(f"segment label id = {segment["label_id"]}")
+        label = model.config.id2label[id['label_id']]
+        print(f"label = {label}")
 
     return predicted_map
 
