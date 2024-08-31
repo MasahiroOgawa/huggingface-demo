@@ -101,8 +101,14 @@ def show_image_comparison(image, predicted_map, segmentation_title):
 if __name__ == "__main__":
     # read argument as an input image name. If there is no argument, use default.
     if len(sys.argv) > 1:
-        image_path = sys.argv[1]
-        image = Image.open(image_path)
+        # print help message
+        if sys.argv[1] == "-h" or sys.argv[1] == "--help":
+            print("Usage: python run_oneformer.py [your image_path]")
+            print("If no image_path is given, a default image is used.")
+            sys.exit(0)
+        else:
+            image_path = sys.argv[1]
+            image = Image.open(image_path)
     else:
         url = "https://huggingface.co/datasets/shi-labs/oneformer_demo/resolve/main/ade20k.jpeg"
         response = requests.get(url, stream=True)
