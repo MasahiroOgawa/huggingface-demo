@@ -27,39 +27,25 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
     model = OneFormerForUniversalSegmentation.from_pretrained(
         model_name
     )
+    inputs = processor(images=image, task_inputs=[
+        task_type], return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**inputs)
 
     if task_type == "semantic":
-        inputs = processor(images=image, task_inputs=[
-                           "semantic"], return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**inputs)
         predicted_map = processor.post_process_semantic_segmentation(
-            outputs, target_sizes=[image.size[::-1]]
-        )[0]
+            outputs, target_sizes=[image.size[::-1]])[0]
         segments_info = None
-
     elif task_type == "instance":
-        inputs = processor(images=image, task_inputs=[
-                           "instance"], return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**inputs)
         prediction = processor.post_process_instance_segmentation(
-            outputs, target_sizes=[image.size[::-1]]
-        )[0]
+            outputs, target_sizes=[image.size[::-1]])[0]
         predicted_map = prediction["segmentation"]
         segments_info = prediction["segments_info"]
-
     elif task_type == "panoptic":
-        inputs = processor(images=image, task_inputs=[
-                           "panoptic"], return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**inputs)
         prediction = processor.post_process_panoptic_segmentation(
-            outputs, target_sizes=[image.size[::-1]]
-        )[0]
+            outputs, target_sizes=[image.size[::-1]])[0]
         predicted_map = prediction["segmentation"]
         segments_info = prediction["segments_info"]
-
     else:
         raise ValueError(
             "Invalid task type. Choose from 'semantic', 'instance', or 'panoptic'"
@@ -119,7 +105,7 @@ if __name__ == "__main__":
     model_name = "shi-labs/oneformer_ade20k_swin_tiny"
     # model_name = "shi-labs/oneformer_coco_swin_large"
     # model_name = "shi-labs/oneformer_ade20k_dinat_large"
-    task_to_run = "panoptic"
+    segmentation_type = "panoptic"
     predicted_map, segments_info = run_segmentation(
-        image, task_to_run, model_name)
-    show_image_comparison(image, predicted_map, task_to_run)
+        image, segmentation_type, model_name)
+    show_image_comparison(image, predicted_map, segmentation_type)
