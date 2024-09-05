@@ -57,7 +57,7 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
     if segments_info is not None:
         for segment in segments_info:
             label = model.config.id2label[segment['label_id']]
-            print(f"segment id = {segment["id"]} : {label}")
+            print(f"segment id = {segment['id']} : {label}")
 
     return predicted_map, segments_info
 
@@ -102,8 +102,10 @@ if __name__ == "__main__":
         image = Image.open(response.raw)
 
     # run segmentation
-    model_name = "shi-labs/oneformer_ade20k_swin_tiny"
-    # model_name = "shi-labs/oneformer_coco_swin_large"
+    # model_name = "shi-labs/oneformer_ade20k_swin_tiny"
+    model_name = "shi-labs/oneformer_coco_swin_large"
+    # model_name = "shi-labs/oneformer_ade20k_swin_large"
+    # model_name = "shi-labs/oneformer_coco_dinat_large"
     # model_name = "shi-labs/oneformer_ade20k_dinat_large"
     segmentation_type = "panoptic"
     predicted_map, segments_info = run_segmentation(
