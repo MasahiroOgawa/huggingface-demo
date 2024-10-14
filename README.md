@@ -5,8 +5,8 @@ This is my first hugging face demo repository to test hugging face codes.
 # How to run inference
 - Set up the environment
 ```bash
-conda env create -f environment.yml
-conda activate huggingface-demo
+uv sync
+source .venv/bin/activate
 ```
 
 - Run demo inference
