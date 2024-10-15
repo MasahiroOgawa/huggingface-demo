@@ -51,15 +51,18 @@ def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer
             "Invalid task type. Choose from 'semantic', 'instance', or 'panoptic'"
         )
 
-    # debug
+    print_debug_info(model, predicted_map, segments_info)    
+
+    return predicted_map, segments_info
+
+
+def print_debug_info(model, predicted_map, segments_info):
     print(f"predicted_map = {predicted_map}")
     print(f"segments_info = {segments_info}")
     if segments_info is not None:
         for segment in segments_info:
             label = model.config.id2label[segment['label_id']]
             print(f"segment id = {segment['id']} : {label}")
-
-    return predicted_map, segments_info
 
 
 def show_image_comparison(image, predicted_map, segmentation_title):
@@ -81,6 +84,31 @@ def show_image_comparison(image, predicted_map, segmentation_title):
     plt.axis("off")
     plt.savefig("oneformer_segm.png")
     plt.show()
+
+def write_classinfo_onimage(model, segments_info, predicted_map):
+    for segment in segments_info:
+        label = model.config.id2label[segment['label_id']]
+        segment_id = segment['id']
+        mask = predicted_map == segment_id  # Create a binary mask for the segment
+        centroid_x, centroid_y = calculate_centroid(mask)
+        # draw label on image
+
+
+        # plt.text(centroid_x, centroid_y, label, fontsize=12, color='black')  
+          
+
+def calculate_centroid(mask) -> tuple[float, float]:
+    """Calculates the centroid of a binary mask.
+    Args:
+        mask (np.ndarray or torch.Tensor): The binary mask. 
+    Returns:
+        tuple[float, float]: The x, y coordinates of the centroid.
+    """
+    if isinstance(mask, torch.Tensor):
+        mask = mask.cpu().numpy()
+    indices = np.argwhere(mask).astype(float)
+    centroid = indices.mean(axis=0)
+    return centroid[1], centroid[0]
 
 
 # run below sample if this file is called as main
