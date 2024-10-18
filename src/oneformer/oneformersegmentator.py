@@ -5,6 +5,16 @@ import matplotlib.pyplot as plt
 import torch
 
 class OneFormerSegmentator:
+    """A class for segmenting images using OneFormer models.
+    Args:
+        model_name (str): The name of the model to use. You can select from the following models:
+            - "shi-labs/oneformer_ade20k_swin_tiny"
+            - "shi-labs/oneformer_coco_swin_large"
+            - "shi-labs/oneformer_ade20k_swin_large"
+            - "shi-labs/oneformer_coco_dinat_large"
+            - "shi-labs/oneformer_ade20k_dinat_large"
+        task_type (str): The type of segmentation task to perform. Choose from 'semantic', 'instance', or 'panoptic'.
+    """
     def __init__(self, model_name="shi-labs/oneformer_ade20k_dinat_large", task_type="panoptic"):
         self.processor = OneFormerProcessor.from_pretrained(model_name)
         self.model = OneFormerForUniversalSegmentation.from_pretrained(model_name)

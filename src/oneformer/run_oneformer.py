@@ -22,13 +22,9 @@ if __name__ == "__main__":
         image = Image.open(response.raw)
 
     # run segmentation
-    # model_name = "shi-labs/oneformer_ade20k_swin_tiny"
     model_name = "shi-labs/oneformer_coco_swin_large"
-    # model_name = "shi-labs/oneformer_ade20k_swin_large"
-    # model_name = "shi-labs/oneformer_coco_dinat_large"
-    # model_name = "shi-labs/oneformer_ade20k_dinat_large"
     task_type = "panoptic"
-    oneformer = OneFormerSegmentator(model_name=model_name, task_type=task_type)
+    oneformer = OneFormerSegmentator(model_name, task_type)
     predicted_map, segments_info = oneformer.inference(
         image)
     oneformer.print_debug_info()
