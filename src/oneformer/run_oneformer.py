@@ -1,115 +1,7 @@
-# ref: https://huggingface.co/learn/computer-vision-course/en/unit3/vision-transformers/oneformer
-from transformers import OneFormerProcessor, OneFormerForUniversalSegmentation
+from oneformersegmentator import OneFormerSegmentator
+import sys
 from PIL import Image
 import requests
-import matplotlib.pyplot as plt
-import torch
-import sys
-
-
-def run_segmentation(image, task_type="panoptic", model_name="shi-labs/oneformer_ade20k_dinat_large"):
-    """Performs image segmentation based on the given task type.
-
-    Args:
-        image (PIL.Image): The input image.
-        task_type (str): The type of segmentation to perform ('semantic', 'instance', or 'panoptic').
-
-    Returns:
-        PIL.Image: The segmented image.
-        segments_info (dictionary): contains additional information on each segment.
-
-    Raises:
-        ValueError: If the task type is invalid.
-    """
-    processor = OneFormerProcessor.from_pretrained(
-        model_name
-    )  # Load once here
-    model = OneFormerForUniversalSegmentation.from_pretrained(
-        model_name
-    )
-    inputs = processor(images=image, task_inputs=[
-        task_type], return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    if task_type == "semantic":
-        predicted_map = processor.post_process_semantic_segmentation(
-            outputs, target_sizes=[image.size[::-1]])[0]
-        segments_info = None
-    elif task_type == "instance":
-        prediction = processor.post_process_instance_segmentation(
-            outputs, target_sizes=[image.size[::-1]])[0]
-        predicted_map = prediction["segmentation"]
-        segments_info = prediction["segments_info"]
-    elif task_type == "panoptic":
-        prediction = processor.post_process_panoptic_segmentation(
-            outputs, target_sizes=[image.size[::-1]])[0]
-        predicted_map = prediction["segmentation"]
-        segments_info = prediction["segments_info"]
-    else:
-        raise ValueError(
-            "Invalid task type. Choose from 'semantic', 'instance', or 'panoptic'"
-        )
-
-    print_debug_info(model, predicted_map, segments_info)    
-
-    return predicted_map, segments_info
-
-
-def print_debug_info(model, predicted_map, segments_info):
-    print(f"predicted_map = {predicted_map}")
-    print(f"segments_info = {segments_info}")
-    if segments_info is not None:
-        for segment in segments_info:
-            label = model.config.id2label[segment['label_id']]
-            print(f"segment id = {segment['id']} : {label}")
-
-
-def show_image_comparison(image, predicted_map, segmentation_title):
-    """Displays the original image and the segmented image side-by-side.
-
-    Args:
-        image (PIL.Image): The original image.
-        predicted_map (PIL.Image): The segmented image.
-        segmentation_title (str): The title for the segmented image.
-    """
-    plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)
-    plt.imshow(image)
-    plt.title("Original Image")
-    plt.axis("off")
-    plt.subplot(1, 2, 2)
-    plt.imshow(predicted_map)
-    plt.title(segmentation_title + " Segmentation")
-    plt.axis("off")
-    plt.savefig("oneformer_segm.png")
-    plt.show()
-
-def write_classinfo_onimage(model, segments_info, predicted_map):
-    for segment in segments_info:
-        label = model.config.id2label[segment['label_id']]
-        segment_id = segment['id']
-        mask = predicted_map == segment_id  # Create a binary mask for the segment
-        centroid_x, centroid_y = calculate_centroid(mask)
-        # draw label on image
-
-
-        # plt.text(centroid_x, centroid_y, label, fontsize=12, color='black')  
-          
-
-def calculate_centroid(mask) -> tuple[float, float]:
-    """Calculates the centroid of a binary mask.
-    Args:
-        mask (np.ndarray or torch.Tensor): The binary mask. 
-    Returns:
-        tuple[float, float]: The x, y coordinates of the centroid.
-    """
-    if isinstance(mask, torch.Tensor):
-        mask = mask.cpu().numpy()
-    indices = np.argwhere(mask).astype(float)
-    centroid = indices.mean(axis=0)
-    return centroid[1], centroid[0]
-
 
 # run below sample if this file is called as main
 if __name__ == "__main__":
@@ -136,6 +28,7 @@ if __name__ == "__main__":
     # model_name = "shi-labs/oneformer_coco_dinat_large"
     # model_name = "shi-labs/oneformer_ade20k_dinat_large"
     segmentation_type = "panoptic"
-    predicted_map, segments_info = run_segmentation(
-        image, segmentation_type, model_name)
-    show_image_comparison(image, predicted_map, segmentation_type)
+    oneformer = OneFormerSegmentator(model_name=model_name, task_type=segmentation_type)
+    predicted_map, segments_info = oneformer.inference(
+        image)
+    oneformer.show_image_comparison()
