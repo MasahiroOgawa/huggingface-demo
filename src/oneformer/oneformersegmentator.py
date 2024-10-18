@@ -30,8 +30,6 @@ class OneFormerSegmentator:
         else:
             raise ValueError("Invalid task type. Choose from 'semantic', 'instance', or 'panoptic'")
 
-        self.print_debug_info()
-
         return self.predicted_map, self.segments_info
 
     def print_debug_info(self):
@@ -43,7 +41,7 @@ class OneFormerSegmentator:
                 print(f"segment id = {segment['id']} : {label}")
 
 
-    def show_image_comparison(self):
+    def show(self):
         """Displays the original image and the segmented image side-by-side.
 
         Args:
@@ -63,19 +61,19 @@ class OneFormerSegmentator:
         plt.savefig("oneformer_segm.png")
         plt.show()
 
-    def write_classinfo_onimage(model, segments_info, predicted_map):
-        for segment in segments_info:
-            label = model.config.id2label[segment['label_id']]
+    def _write_classinfo_onimage(self):
+        for segment in self.segments_info:
+            label = self.model.config.id2label[segment['label_id']]
             segment_id = segment['id']
-            mask = predicted_map == segment_id  # Create a binary mask for the segment
-            centroid_x, centroid_y = calculate_centroid(mask)
+            mask = self.predicted_map == segment_id  # Create a binary mask for the segment
+            centroid_x, centroid_y = self._calculate_centroid(mask)
             # draw label on image
 
 
             # plt.text(centroid_x, centroid_y, label, fontsize=12, color='black')  
             
 
-    def calculate_centroid(mask) -> tuple[float, float]:
+    def _calculate_centroid(self, mask) -> tuple[float, float]:
         """Calculates the centroid of a binary mask.
         Args:
             mask (np.ndarray or torch.Tensor): The binary mask. 
