@@ -66,22 +66,23 @@ class OneFormerSegmentator:
         plt.title("Original Image")
         plt.axis("off")
         plt.subplot(1, 2, 2)
-
         plt.imshow(self.predicted_map)
         if with_label:
-            for segment in self.segments_info:
-                label = self.model.config.id2label[segment['label_id']]
-                segment_id = segment['id']
-                mask = self.predicted_map == segment_id  # Create a binary mask for the segment
-                centroid_x, centroid_y = self._calculate_centroid(mask)
-                # draw label on image
-                plt.text(centroid_x, centroid_y, label, fontsize=12, color='black')  
-
+            self._draw_labels()
         plt.title(self.task_type + " Segmentation")
         plt.axis("off")
         plt.savefig("oneformer_segm.png")
         plt.show()
              
+    def _draw_labels(self):
+        for segment in self.segments_info:
+            label = self.model.config.id2label[segment['label_id']]
+            segment_id = segment['id']
+            mask = self.predicted_map == segment_id  # Create a binary mask for the segment
+            centroid_x, centroid_y = self._calculate_centroid(mask)
+            # draw label on image
+            plt.text(centroid_x, centroid_y, label, fontsize=12, color='black')  
+
 
     def _calculate_centroid(self, mask) -> tuple[float, float]:
         """Calculates the centroid of a binary mask.
