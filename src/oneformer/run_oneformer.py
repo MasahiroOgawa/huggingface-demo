@@ -27,5 +27,5 @@ if __name__ == "__main__":
     oneformer = OneFormerSegmentator(model_name, task_type)
     predicted_map, segments_info = oneformer.inference(
         image)
-    oneformer.print_debug_info()
+    oneformer.print_info()
     oneformer.show()

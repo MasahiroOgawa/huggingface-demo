@@ -43,7 +43,7 @@ class OneFormerSegmentator:
 
         return self.predicted_map, self.segments_info
 
-    def print_debug_info(self):
+    def print_info(self):
         print(f"predicted_map = {self.predicted_map}")
         print(f"segments_info = {self.segments_info}")
         if self.segments_info is not None:
