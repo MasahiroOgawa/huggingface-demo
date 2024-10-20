@@ -16,7 +16,7 @@ class OneFormerSegmentator:
             - "shi-labs/oneformer_ade20k_dinat_large"
         task_type (str): The type of segmentation task to perform. Choose from 'semantic', 'instance', or 'panoptic'.
     """
-    def __init__(self, model_name="shi-labs/oneformer_ade20k_dinat_large", task_type="panoptic"):
+    def __init__(self, model_name="shi-labs/oneformer_coco_swin_large", task_type="panoptic"):
         self.processor = OneFormerProcessor.from_pretrained(model_name)
         self.model = OneFormerForUniversalSegmentation.from_pretrained(model_name)
         self.task_type = task_type
