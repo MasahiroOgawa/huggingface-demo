@@ -43,13 +43,19 @@ class OneFormerSegmentator:
 
         return self.predicted_map, self.segments_info
 
-    def print_info(self):
+    def print_result(self):
         print(f"predicted_map = {self.predicted_map}")
         print(f"segments_info = {self.segments_info}")
         if self.segments_info is not None:
             for segment in self.segments_info:
                 label = self.model.config.id2label[segment['label_id']]
                 print(f"segment id = {segment['id']} : {label}")
+
+
+    def print_alllabels(self):
+        labels = self.model.config.id2label
+        for id, name in labels.items():
+            print(f"{id} : {name}")
 
 
     def show(self, with_label: bool = True):
